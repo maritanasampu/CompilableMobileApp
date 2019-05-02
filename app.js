@@ -24,6 +24,8 @@ class App extends Component {
       items: [],
       dataSource: ds.cloneWithRows([])
     };
+    this.handleUpdateText = this.handleUpdateText.bind(this);
+    this.handleToggleEditing = this.handleToggleEditing.bind(this);
     this.handleFilter = this.handleFilter.bind(this);
     this.handleRemoveItem = this.handleRemoveItem.bind(this);
     this.handleToggleComplete = this.handleToggleComplete.bind(this);
@@ -46,6 +48,28 @@ class App extends Component {
     })
   }
 
+  handleUpdateText(key, text) {
+    const newItems = this.state.items.map((item) => {
+      if (item.key !== key) return item;
+      return {
+        ...item,
+        text
+      }
+    });
+    this.setSource(newItems, filterItems(this.state.filter, newItems));
+  }
+
+  handleToggleEditing(key, editing) {
+    const newItems = this.state.items.map((item) => {
+      if (item.key !== key) return item;
+      return {
+        ...item,
+        editing
+      }
+    });
+
+    this.setSource(newItems, filterItems(this.state.filter, newItems));
+  }
   setSource(items, itemsDatasource, otherState = {}) {
     this.setState({
       items,
@@ -103,7 +127,7 @@ class App extends Component {
     ];
     this.setSource(newItems, filterItems(this.state.filter, newItems), { value: "" })
   }
-  
+
   render() {
     return (
       <View style={styles.container}>
@@ -123,6 +147,8 @@ class App extends Component {
               return (
                 <Row
                   key={key}
+                  onUpdate={(text) => this.handleUpdateText(key, text)}
+                  onToggleEdit={(editing) => this.handleToggleEditing(key, editing)}
                   onRemove={() => this.handleRemoveItem(key)}
                   onComplete={(complete) => this.handleToggleComplete(key, complete)}
                   {...value}
