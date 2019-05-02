@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Text, StyleSheet, Platform, ListView, Keyboard } from "react-native";
+import { View, Text, StyleSheet, ActivityIndicator, Platform, ListView, Keyboard, AsyncStorage } from "react-native";
 import Header from "./header";
 import Footer from "./footer";
 import Row from "./row";
@@ -17,6 +17,7 @@ class App extends Component {
     super(props);
     const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
     this.state = {
+      loading: true,
       allComplete: false,
       filter: "ALL",
       value: "",
@@ -32,12 +33,26 @@ class App extends Component {
     this.handleClearComplete = this.handleClearComplete.bind(this);
   }
 
+  componentWillMount() {
+    AsyncStorage.getItem("items").then((json) => {
+      try {
+        const items = JSON.parse(json);
+        this.setSource(items, items, { loading: false});
+      } catch(e) {
+        this.setState({
+          loading: false
+        })
+      }
+    })
+  }
+
   setSource(items, itemsDatasource, otherState = {}) {
     this.setState({
       items,
       dataSource: this.state.dataSource.cloneWithRows(itemsDatasource),
       ...otherState
-    })
+    });
+    AsyncStorage.setItem("items", JSON.stringify(items));
   }
 
   handleClearComplete() {
@@ -63,7 +78,7 @@ class App extends Component {
         ...item,
         complete
       }
-    })
+    });
     this.setSource(newItems, filterItems(this.state.filter, newItems));
   }
 
@@ -72,7 +87,7 @@ class App extends Component {
     const newItems = this.state.items.map((item) => ({
       ...item,
       complete
-    }))
+    }));
     this.setSource(newItems, filterItems(this.state.filter, newItems), { allComplete: complete })
   }
 
@@ -88,7 +103,7 @@ class App extends Component {
     ];
     this.setSource(newItems, filterItems(this.state.filter, newItems), { value: "" })
   }
-
+  
   render() {
     return (
       <View style={styles.container}>
@@ -125,6 +140,12 @@ class App extends Component {
           filter={this.state.filter}
           onClearComplete={this.handleClearComplete}
         />
+        {this.state.loading && <View style={styles.loading}>
+          <ActivityIndicator
+            animating
+            size="large"
+          />
+        </View>}
       </View>
     );
   }
@@ -134,6 +155,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F5F5F5",
+  },
+  loading: {
+    position: "absolute",
+    left: 0,
+    top: 0,
+    right: 0,
+    bottom: 0,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(0,0,0,.2)"
   },
   content: {
     flex: 1
