@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Switch, TouchableOpacity, TextInput } from "rea
 
 class Row extends Component {
   render() {
-    const { complete } = this.props;
+    const { complete, important } = this.props;
     const textComponent = (
       <TouchableOpacity style={styles.textWrap} onLongPress={() => this.props.onToggleEdit(true)}>
         <Text style={[styles.text, complete && styles.complete]}>{this.props.text}</Text>
@@ -23,8 +23,12 @@ class Row extends Component {
           autoFocus
           value={this.props.text}
           style={styles.input}
-          multiline
         />
+        <TouchableOpacity onPress={() => this.props.onImportant(!important)}>
+          <Text style={important ? styles.importantTextActive : styles.importantText}>
+            {important ? "Mark as unimportant" : "Mark as important"}
+          </Text>
+        </TouchableOpacity>
       </View>
     );
 
@@ -55,7 +59,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between"
   },
   input: {
-    height: 100,
+    height: 60,
     flex: 1,
     fontSize: 24,
     padding: 0,
@@ -85,6 +89,12 @@ const styles = StyleSheet.create({
   destroy: {
     fontSize: 20,
     color: "#cc9a9a"
+  },
+  importantText: {
+    color: "#D63B2F"
+  },
+  importantTextActive: {
+    color: "#0A8F08"
   }
 });
 export default Row;

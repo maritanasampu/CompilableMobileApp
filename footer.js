@@ -6,13 +6,16 @@ class Footer extends Component {
     const { filter } = this.props;
     return (
       <View style={styles.container}>
-        <Text>{this.props.count} count</Text>
+        <Text>{this.props.count}</Text>
         <View style={styles.filters}>
           <TouchableOpacity style={[styles.filter, filter === "ALL" && styles.selected]} onPress={() => this.props.onFilter("ALL")}>
             <Text>All</Text>
           </TouchableOpacity>
           <TouchableOpacity style={[styles.filter, filter === "ACTIVE" && styles.selected]} onPress={() => this.props.onFilter("ACTIVE")}>
             <Text>Active</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.filter, filter === "IMPORTANT" && styles.selected]} onPress={() => this.props.onFilter("IMPORTANT")}>
+            <Text>Important</Text>
           </TouchableOpacity>
           <TouchableOpacity style={[styles.filter, filter === "COMPLETED" && styles.selected]} onPress={() => this.props.onFilter("COMPLETED")}>
             <Text>Completed</Text>

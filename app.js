@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Text, StyleSheet, ActivityIndicator, Platform, ListView, Keyboard, AsyncStorage } from "react-native";
+import { View, StyleSheet, ActivityIndicator, ListView, Keyboard, AsyncStorage } from "react-native";
 import Header from "./header";
 import Footer from "./footer";
 import Row from "./row";
@@ -9,6 +9,7 @@ const filterItems = (filter, items) => {
     if (filter === "ALL") return true;
     if (filter === "COMPLETED") return item.complete;
     if (filter === "ACTIVE") return !item.complete;
+    if (filter === "IMPORTANT") return item.important && !item.complete;
   })
 };
 
@@ -29,6 +30,7 @@ class App extends Component {
     this.handleFilter = this.handleFilter.bind(this);
     this.handleRemoveItem = this.handleRemoveItem.bind(this);
     this.handleToggleComplete = this.handleToggleComplete.bind(this);
+    this.handleToggleImportant = this.handleToggleImportant.bind(this);
     this.setSource = this.setSource.bind(this);
     this.handleAddItem = this.handleAddItem.bind(this);
     this.handleToggleAllComplete = this.handleToggleAllComplete.bind(this);
@@ -106,6 +108,17 @@ class App extends Component {
     this.setSource(newItems, filterItems(this.state.filter, newItems));
   }
 
+  handleToggleImportant(key, important) {
+    const newItems = this.state.items.map((item) => {
+      if (item.key !== key) return item;
+      return {
+        ...item,
+        important
+      }
+    });
+    this.setSource(newItems, filterItems(this.state.filter, newItems));
+  }
+
   handleToggleAllComplete() {
     const complete = !this.state.allComplete;
     const newItems = this.state.items.map((item) => ({
@@ -151,6 +164,7 @@ class App extends Component {
                   onToggleEdit={(editing) => this.handleToggleEditing(key, editing)}
                   onRemove={() => this.handleRemoveItem(key)}
                   onComplete={(complete) => this.handleToggleComplete(key, complete)}
+                  onImportant={(important) => this.handleToggleImportant(key, important)}
                   {...value}
                 />
               )
